@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 function Products() {
     const navigate = useNavigate();
 
-useEffect(() => {
+    useEffect(() => {
 
   const loggedIn = localStorage.getItem("isLoggedIn");
 
@@ -20,7 +20,7 @@ useEffect(() => {
 
   useEffect(() => {
 
-    fetch("https://fakestoreapi.com/products")
+    fetch(`${import.meta.env.VITE_API_URL}/products`)
       .then((response) => {
 
         if (!response.ok) {

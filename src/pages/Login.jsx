@@ -1,34 +1,57 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
 
-  e.preventDefault();
+    e.preventDefault();
 
-  if (
-    email === "test11@gmail.com" &&
-    password === "pass123"
-  ) {
     setError("");
+    setLoading(true);
 
-    localStorage.setItem("isLoggedIn", "true");
+    try {
 
-    navigate("/products");
+      const response = await axios.post(
+        ${import.meta.env.VITE_API_URL}/login`,
+        {
+          email,
+          password
+        }
+      );
 
-  } else {
+      if (response.status === 200) {
 
-    setError("Invalid email or password");
+        localStorage.setItem("isLoggedIn", "true");
+        localStorage.setItem("userEmail", response.data.email);
+        localStorage.setItem("userName", response.data.name);
 
-  }
-};
+        navigate("/products");
+      }
+
+    } catch (error) {
+
+      if (error.response) {
+        setError(error.response.data.message);
+      } else {
+        setError("Unable to connect to server");
+      }
+
+    } finally {
+
+      setLoading(false);
+
+    }
+  };
 
   return (
 
@@ -45,13 +68,6 @@ function Login() {
         <p className="login-subtitle">
           Login to continue shopping
         </p>
-        <div className="demo-login">
-  <strong>Demo Login</strong>
-  <br />
-  Email: test11@gmail.com
-  <br />
-  Password: pass123
-</div>
 
         <form onSubmit={handleLogin}>
 
@@ -92,11 +108,19 @@ function Login() {
           <button
             type="submit"
             className="login-button"
+            disabled={loading}
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
 
         </form>
+
+        <p className="signup-link">
+          Don't have an account?{" "}
+          <span onClick={() => navigate("/signup")}>
+            Create Account
+          </span>
+        </p>
 
       </div>
 
